@@ -1,0 +1,28 @@
+﻿name: Pack and publish
+
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - '*'
+
+jobs:
+  pack_and_publish:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/dotnet/sdk:8.0
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Get version and save it as output
+      id: get_version
+      run: |
+        echo ::set-output name=version::${GITHUB_REF##*/}
+
+    - name: Pack
+      run: dotnet pack -c Release -o ./packages -p:PackageVersion=${{ steps.get_version.outputs.version }}
+    - name: Push to NuGet
+      env:
+        API_KEY: ${{ secrets.NUGET_API_KEY }}
+      run: |
+        dotnet nuget push ./packages/**/*.nupkg -s https://api.nuget.org/v3/index.json -k $API_KEY --no-symbols
