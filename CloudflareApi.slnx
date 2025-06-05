@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CloudflareApi.Client/CloudflareApi.Client.csproj" />
+  </Folder>
+</Solution>
